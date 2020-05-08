@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
+
+import { Country } from '@models/country.model';
+
+const apiURL: string = 'https://api.paymentwall.com/api/';
+const apiAllCountries: string = 'https://account.fasterpay.com/api/countries';
+const uid: string = '52e368ca73af471771274f3cc6833ac8'
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  apiURL: string = 'https://api.paymentwall.com/api/';
-  uid: string = '52e368ca73af471771274f3cc6833ac8'
-
   // Http Headers
   httpOptions = {
     headers: new HttpHeaders({
@@ -20,16 +24,27 @@ export class ApiService {
 
   constructor(private httpClient: HttpClient) { }
 
-  GetCountry(): Observable<any> {
-    return this.httpClient.get(this.apiURL + 'rest/country?uid=' + this.uid)
+  GetAllCountries(): Observable<Country[]> {
+    return this.httpClient.get<Country[]>(apiAllCountries)
       .pipe(
         retry(1),
         catchError(this.errorHandle)
       )
   }
 
-  GetPaymentMethod(): Observable<any> {
-    return this.httpClient.get(this.apiURL + 'payment-systems/?country_code=vn')
+  GetCountry(): Observable<Country> {
+    return this.httpClient.get<Country>(apiURL + 'rest/country?uid=' + uid)
+      .pipe(
+        retry(1),
+        catchError(this.errorHandle)
+      )
+  }
+
+  GetPaymentMethod(countryCode): Observable<any> {
+    let params = {
+      country_code: countryCode
+    }
+    return this.httpClient.get(apiURL + 'payment-systems/', { params })
       .pipe(
         retry(1),
         catchError(this.errorHandle)

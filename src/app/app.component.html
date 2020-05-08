@@ -8,89 +8,115 @@
   <div class="row justify-content-center">
     <div class="col-12 col-md-8">
       <h4 class="mb-3">Billing address</h4>
-      <form [formGroup]="paymentForm">
+      <form [formGroup]="paymentForm" #ngForm="ngForm" (ngSubmit)="onSubmit()">
         <div class="row">
-          <div class="col-md-5 mb-3">
+          <div class="col-md-6 mb-3">
             <label for="country">Country</label>
-            <select class="custom-select d-block w-100 form-control" name="country" formControlName="country"
-              (change)="changeCountry($event)">
+            <select class="custom-select d-block w-100 form-control" formControlName="country"
+              [ngClass]="{ 'is-invalid': (f.country.touched || ngForm.submitted) && f.country.errors }">
               <option value="">Choose...</option>
-              <option *ngFor="let data of countries" [value]="data.code">{{ data.country }}</option>
+              <option *ngFor="let data of countries" [value]="data.code">{{ data.name }}</option>
             </select>
             <div class="invalid-feedback">
               Please select a valid country.
             </div>
           </div>
-          <div class="col-md-5 mb-3">
-            <label for="country">Amount {{testMoney}}</label>
-            <input type="text" class="form-control" placeholder="" required="">
+          <div class="col-md-6 mb-3">
+            <label for="amount">Amount</label>
+            <input id="amount" type="text" mask="separator.2" thousandSeparator="," class="form-control"
+              placeholder="Input a number" formControlName="amount"
+              [ngClass]="{ 'is-invalid': (f.amount.touched || ngForm.submitted) && f.amount.errors }">
             <div class="invalid-feedback">
-              Please select a valid country.
+              Amount cannot be empty.
             </div>
           </div>
         </div>
 
         <h4 class="mb-3">Payment</h4>
 
-        <div class="d-block my-3">
-          <div class="custom-control custom-radio">
-            <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked="" required="">
-            <label class="custom-control-label" for="credit">Credit card</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" required="">
-            <label class="custom-control-label" for="debit">Debit card</label>
-          </div>
-          <div class="custom-control custom-radio">
-            <input id="paypal" name="paymentMethod" type="radio" class="custom-control-input" required="">
-            <label class="custom-control-label" for="paypal">Paypal</label>
+        <div class="d-flex flex-column my-3 form-control"
+          [ngClass]="{ 'is-invalid': (f.paymentMethod.touched || ngForm.submitted) && f.paymentMethod.errors }">
+          <div class="payment-method custom-control custom-radio" *ngFor="let item of paymentMethods">
+            <input id="{{item.id}}" formControlName="paymentMethod" type="radio" class="custom-control-input"
+              [value]="item.id">
+            <label class="custom-control-label" for="{{item.id}}">
+              <img [src]="item.img_url" alt="{{ item.name }}" width="auto" height="40" />{{ item.name }}
+            </label>
           </div>
         </div>
+        <div class="invalid-feedback">
+          You must pick a PaymentWall Method
+        </div>
+
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="cc-name">Name on card</label>
-            <input type="text" class="form-control" id="cc-name" placeholder="" required="">
-            <small class="text-muted">Full name as displayed on card</small>
+            <input matInput mask="S* S*" class="form-control" id="cc-name" placeholder="Name displayed on card"
+              formControlName="cardName"
+              [ngClass]="{ 'is-invalid': (f.cardName.touched || ngForm.submitted) && f.cardName.errors }">
             <div class="invalid-feedback">
               Name on card is required
             </div>
           </div>
           <div class="col-md-6 mb-3">
             <label for="cc-number">Credit card number</label>
-            <input type="text" class="form-control" id="cc-number" placeholder="" required="">
+            <input matInput mask="0000 0000 0000 0000" [validation]="false" class="form-control" id="cc-number"
+              placeholder="Card Number" formControlName="cardNumber"
+              [ngClass]="{ 'is-invalid': (f.cardNumber.touched || ngForm.submitted) && f.cardNumber.errors }">
             <div class="invalid-feedback">
-              Credit card number is required
+              Credit card number is required and must be valid
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-md-3 mb-3">
             <label for="cc-expiration">Expiration</label>
-            <input type="text" class="form-control" id="cc-expiration" placeholder="" required="">
+            <input matInput mask="M0/00" [specialCharacters]="['/']" [dropSpecialCharacters]="false"
+              class="form-control" id="cc-expiration" placeholder="00/00" formControlName="cardExp"
+              [ngClass]="{ 'is-invalid': (f.cardExp.touched || ngForm.submitted) && f.cardExp.errors }">
             <div class="invalid-feedback">
               Expiration date required
             </div>
           </div>
           <div class="col-md-3 mb-3">
             <label for="cc-expiration">CVV</label>
-            <input type="text" class="form-control" id="cc-cvv" placeholder="" required="">
+            <input matInput mask="000" class="form-control" id="cc-cvv" [validation]="true" placeholder="CVV"
+              formControlName="cardCVV"
+              [ngClass]="{ 'is-invalid': (f.cardCVV.touched || ngForm.submitted) && f.cardCVV.errors }">
             <div class="invalid-feedback">
               Security code required
             </div>
           </div>
         </div>
         <hr class="mb-4">
-        <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
+        <button class="btn btn-primary btn-lg btn-block" type="submit">
+          Pay {{paymentForm.get('amount').value | mask: 'separator':','}}
+        </button>
       </form>
     </div>
   </div>
 
   <footer class="my-5 pt-5 text-muted text-center text-small">
-    <p class="mb-1">© 2017-2018 Company Name</p>
+    <p class="mb-1">© 2020 Author: Alex Lee</p>
     <ul class="list-inline">
-      <li class="list-inline-item"><a href="#">Privacy</a></li>
-      <li class="list-inline-item"><a href="#">Terms</a></li>
-      <li class="list-inline-item"><a href="#">Support</a></li>
+      <li class="list-inline-item"><a href="https://www.facebook.com/sonlestore/" target="_blank">SonLe Store</a></li>
     </ul>
   </footer>
+</div>
+
+<div bsModal #childModal="bs-modal" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="dialog-child-name">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 id="dialog-child-name" class="modal-title pull-left">Sucessfully</h4>
+        <button type="button" class="close pull-right text-success" aria-label="Close" (click)="hideChildModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Thank you for using PaymentWall!
+      </div>
+    </div>
+  </div>
 </div>

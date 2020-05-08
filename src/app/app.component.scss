@@ -1,0 +1,12 @@
+.payment-method {
+    padding: 0.5rem 2rem;
+    .custom-control-label {
+        display: grid;
+        font-size: 14px;
+    
+        &::before, &::after {
+            top: 1.25rem;
+            left: -2rem;
+        }
+    }
+}
