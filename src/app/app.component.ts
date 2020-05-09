@@ -1,6 +1,5 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { formatCurrency } from '@angular/common';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 
 import { ApiService } from './services/api.service';
@@ -18,7 +17,6 @@ export class AppComponent implements OnInit {
   countries: Country[];
   paymentMethods: any[];
   paymentForm: FormGroup;
-  testMoney: string;
 
   constructor(private apiService: ApiService, private formBuilder: FormBuilder) { }
 
@@ -36,7 +34,6 @@ export class AppComponent implements OnInit {
     // Get API Data
     this.apiService.GetAllCountries().subscribe(data => this.countries = data);
     this.apiService.GetCountry().subscribe(data => this.paymentForm.patchValue({ 'country': data.code }));
-    this.testMoney = formatCurrency(10000, 'en', 'VND');
 
     this.onCountryChange();
   }
@@ -53,9 +50,8 @@ export class AppComponent implements OnInit {
 
   onCountryChange() {
     this.paymentForm.get('country').valueChanges.subscribe(async (val) => {
-      console.log('country changes', val);
+      this.paymentForm.patchValue({ 'paymentMethod': '' });
       this.apiService.GetPaymentMethod(val).subscribe(data => {
-        console.log('GetPaymentMethod', data);
         this.paymentMethods = data || [];
       }, error => console.log(error));
     })
@@ -64,7 +60,7 @@ export class AppComponent implements OnInit {
   showChildModal() {
     this.childModal.show();
   }
- 
+
   hideChildModal() {
     this.childModal.hide();
   }
