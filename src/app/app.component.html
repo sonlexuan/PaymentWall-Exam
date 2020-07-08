@@ -34,7 +34,7 @@
 
         <h4 class="mb-3">Payment</h4>
 
-        <div class="d-flex flex-column my-3 form-control"
+        <div class="d-flex flex-column my-3"
           [ngClass]="{ 'is-invalid': (f.paymentMethod.touched || ngForm.submitted) && f.paymentMethod.errors }">
           <div class="payment-method custom-control custom-radio" *ngFor="let item of paymentMethods">
             <input id="{{item.id}}" formControlName="paymentMethod" type="radio" class="custom-control-input"
